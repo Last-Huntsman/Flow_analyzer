@@ -1,4 +1,4 @@
-package Transaction;
+package Models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
