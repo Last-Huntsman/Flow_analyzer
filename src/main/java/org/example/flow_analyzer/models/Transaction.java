@@ -16,10 +16,11 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private double operation;
-    private LocalDateTime DataTime;
-    private String description;
+    private double operation; //Сумма
+    private LocalDateTime dateTime;
+    private String description;//Описание
     @ManyToOne
-    @JoinColumn(name = "сategory_id")
-    Category сategory;
+    @JoinColumn(name = "category_id")
+
+    Category category;
 }

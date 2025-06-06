@@ -1,10 +1,24 @@
-spring.application.name=Flow_analyzer
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Expenses
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/Expenses
-spring.datasource.username=postgres
-spring.datasource.password=1234
-spring.datasource.driver-class-name=org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
