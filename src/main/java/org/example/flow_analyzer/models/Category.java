@@ -1,4 +1,4 @@
-package Models;
+package org.example.flow_analyzer.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +15,6 @@ import lombok.NoArgsConstructor;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    final  int id;
-    final  String category;
+    private   int id;
+    private   String category;
 }

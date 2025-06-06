@@ -1,6 +1,6 @@
-package Repository;
+package org.example.flow_analyzer.repository;
 
-import Models.Transaction;
+import org.example.flow_analyzer.models.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
