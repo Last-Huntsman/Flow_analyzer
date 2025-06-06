@@ -18,7 +18,7 @@ public class Transaction {
     private int id;
     private double operation;
     private LocalDateTime DataTime;
-
+    private String description;
     @ManyToOne
     @JoinColumn(name = "сategory_id")
     Category сategory;
