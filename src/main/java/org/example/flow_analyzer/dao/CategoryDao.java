@@ -3,11 +3,14 @@ package org.example.flow_analyzer.dao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+import lombok.Data;
 import org.example.flow_analyzer.models.Category;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
+@Data
+@Repository
 public class CategoryDao {
 
     private final EntityManager em;

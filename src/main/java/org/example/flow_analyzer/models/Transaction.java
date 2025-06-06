@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,10 +18,10 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private double operation; //Сумма
-    private LocalDateTime dateTime;
+    private LocalDate localDate;
     private String description;//Описание
     @ManyToOne
     @JoinColumn(name = "category_id")
 
-    Category category;
+    private Category category;
 }
