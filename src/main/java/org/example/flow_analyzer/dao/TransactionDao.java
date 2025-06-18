@@ -14,28 +14,20 @@ public class TransactionDao {
 
     private final EntityManager em;
 
-    // Конструктор, EntityManager передаётся извне (например, через DI)
     public TransactionDao(EntityManager em) {
         this.em = em;
     }
 
-    // Сохранение новой транзакции
     public void save(Transaction transaction) {
-        em.getTransaction().begin();// начинаем транзакцию
-        em.persist(transaction);// сохраняем сущность
-        em.getTransaction().commit();// фиксируем изменения
+        em.persist(transaction);
     }
 
-    // Поиск по ID
     public Optional<Transaction> findById(int id) {
-        Transaction transaction = em.find(Transaction.class, id);
-        return Optional.ofNullable(transaction);
+        return Optional.ofNullable(em.find(Transaction.class, id));
     }
 
-    // Получить все транзакции
     public List<Transaction> findAll() {
         TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t", Transaction.class);
         return query.getResultList();
     }
-
 }

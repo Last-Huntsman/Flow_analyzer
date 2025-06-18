@@ -22,14 +22,14 @@ public class TransactionService {
     private final EntityManager entityManager;
 
     public List<Transaction> getAllTransactions(int page, int size) {
-        return entityManager.createQuery("SELECT t FROM Transaction t ORDER BY t.localDate DESC", Transaction.class)
+        return entityManager.createQuery("SELECT DISTINCT t FROM Transaction t ORDER BY t.localDate DESC", Transaction.class)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();
     }
 
     public long countTransactions() {
-        return entityManager.createQuery("SELECT COUNT(t) FROM Transaction t", Long.class)
+        return entityManager.createQuery("SELECT COUNT(DISTINCT t) FROM Transaction t", Long.class)
                 .getSingleResult();
     }
     public List<Transaction> searchTransactions(
@@ -44,17 +44,17 @@ public class TransactionService {
 
         // Присоединяем таблицу category для фильтрации по названию
         if (category != null && !category.isBlank()) {
-            predicates.add(cb.equal(root.get("category").get("name"), category));
+            predicates.add(cb.equal(root.get("category").get("category"), category));
         }
 
         // Фильтрация по минимальной сумме
         if (minAmount != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("amount"), minAmount));
+            predicates.add(cb.greaterThanOrEqualTo(root.get("operation"), minAmount));
         }
 
         // Фильтрация по максимальной сумме
         if (maxAmount != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("amount"), maxAmount));
+            predicates.add(cb.lessThanOrEqualTo(root.get("operation"), maxAmount));
         }
 
         query.select(root)

@@ -1,6 +1,7 @@
 package org.example.flow_analyzer.service;
 
 import com.opencsv.bean.CsvToBeanBuilder;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,14 @@ import org.example.flow_analyzer.dao.TransactionDao;
 import org.example.flow_analyzer.dto.TransactionDto;
 import org.example.flow_analyzer.models.Transaction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -23,18 +26,20 @@ import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
+
 public class CsvImportService {
     private final Validator validator;
     private final CategoryDao categoryDao;
     private final TransactionDao transactionDao;
-
+ @Transactional
     public List<String> importCsv(MultipartFile file) {
         List<String> errors = new ArrayList<>();
 
-        try (var reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+        try (var reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             var csvList = new CsvToBeanBuilder<TransactionDto>(reader)
                     .withIgnoreLeadingWhiteSpace(true)
                     .withType(TransactionDto.class)
+                    .withSeparator(';')
                     .build()
                     .parse();
 

@@ -21,47 +21,57 @@ public class ReportService {
     // 🔹 5.1: Отчёт по категориям
     public List<CategoryReportDto> getReportByCategory() {
         return entityManager.createQuery("""
-            SELECT new org.example.flow_analyzer.dto.CategoryReportDto(c.category, SUM(t.operation))
-            FROM Transaction t
-            JOIN t.category c
-            GROUP BY c.category
-            ORDER BY SUM(t.operation) DESC
-        """, CategoryReportDto.class).getResultList();
+                    SELECT DISTINCT new org.example.flow_analyzer.dto.CategoryReportDto(c.category, SUM(t.operation))
+                    FROM Transaction t
+                    JOIN t.category c
+                    GROUP BY c.category
+                    ORDER BY SUM(t.operation) DESC
+                """, CategoryReportDto.class).getResultList();
     }
 
     // 🔹 5.2: Отчёт по месяцам
     public List<MonthlyReportDto> getReportByMonth() {
-        return entityManager.createQuery("""
-            SELECT new org.example.flow_analyzer.dto.CategoryReportDto(
-                FUNCTION('TO_CHAR', t.localDate, 'YYYY-MM'), SUM(t.operation))
-            FROM Transaction t
-            GROUP BY FUNCTION('TO_CHAR', t.localDate, 'YYYY-MM')
-            ORDER BY FUNCTION('TO_CHAR', t.localDate, 'YYYY-MM')
-        """, MonthlyReportDto.class).getResultList();
+        List<Object[]> resultList = entityManager.createQuery("""
+        SELECT DISTINCT FUNCTION('TO_CHAR', t.localDate, 'YYYY-MM'), SUM(t.operation)
+        FROM Transaction t
+        GROUP BY FUNCTION('TO_CHAR', t.localDate, 'YYYY-MM')
+        ORDER BY FUNCTION('TO_CHAR', t.localDate, 'YYYY-MM')
+    """).getResultList();
+
+        return resultList.stream()
+                .map(r -> new MonthlyReportDto((String) r[0], (BigDecimal) r[1]))
+                .toList();
     }
+
 
     // 🔹 5.3: Общий отчёт (summary)
     public SummaryReportDto getSummary() {
+
         BigDecimal expenses = entityManager.createQuery("""
-            SELECT COALESCE(SUM(t.operation), 0)
-            FROM Transaction t
-            WHERE t.operation < 0
-        """, BigDecimal.class).getSingleResult();
+                    SELECT  DISTINCT COALESCE(SUM(t.operation), 0)
+                    FROM Transaction t
+                    WHERE t.operation < 0
+                """, BigDecimal.class).getSingleResult();
 
         BigDecimal income = entityManager.createQuery("""
-            SELECT COALESCE(SUM(t.operation), 0)
-            FROM Transaction t
-            WHERE t.operation> 0
-        """, BigDecimal.class).getSingleResult();
+                    SELECT DISTINCT COALESCE(SUM(t.operation), 0)
+                    FROM Transaction t
+                    WHERE t.operation > 0
+                """, BigDecimal.class).getSingleResult();
 
-        BigDecimal avgPerDay = entityManager.createQuery("""
-            SELECT COALESCE(AVG(daily), 0) FROM (
-                SELECT SUM(t.operation) AS daily
-                FROM Transaction t
-                GROUP BY t.localDate
-            )
-        """, BigDecimal.class).getSingleResult();
+        List<BigDecimal> dailySums = entityManager.createQuery("""
+                    SELECT DISTINCT SUM(t.operation)
+                    FROM Transaction t
+                    GROUP BY t.localDate
+                """, BigDecimal.class).getResultList();
+
+        BigDecimal avgPerDay = BigDecimal.ZERO;
+        if (!dailySums.isEmpty()) {
+            BigDecimal sum = dailySums.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+            avgPerDay = sum.divide(BigDecimal.valueOf(dailySums.size()), BigDecimal.ROUND_HALF_UP);
+        }
 
         return new SummaryReportDto(expenses.abs(), income, avgPerDay);
     }
 }
+
